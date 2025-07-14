@@ -14,7 +14,7 @@ class ShoppingCartUtils
         $isProductInCartAlready = false;
         $cacheItem = $cacheItemPool->getItem($clientUUID);
         $cart = $cacheItem->isHit() ? $cacheItem->get() : [];
-
+        var_dump($cart);
        for ($i = 0; $i < count($cart); $i++) {
            if ($cart[$i]['code'] === $item->getCode()){
                if ($item->getQuantity() === 0){

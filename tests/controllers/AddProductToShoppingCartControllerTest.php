@@ -22,7 +22,7 @@ class AddProductToShoppingCartControllerTest extends WebTestCase
         $clientUUID = 'd8a9b999-65a7-41e3-b5ab-ddb30ef12d09';
         $testCache = new ArrayAdapter();
         $product = (new ShoppingCartProduct('my-code', 1, 1000))->toArray();
-        $item = $testCache->getItem($clientUUID)->set($product);
+        $item = $testCache->getItem($clientUUID)->set([$product]);
         $testCache->save($item);
 
         $container->set('cache.app', $testCache);
@@ -37,7 +37,7 @@ class AddProductToShoppingCartControllerTest extends WebTestCase
             $body
         );
 
-        $this->assertEquals('[]', json_decode($client->getResponse()->getContent(), true));
+        $this->assertEquals([$product], json_decode($client->getResponse()->getContent(), true));
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
     }
 }
