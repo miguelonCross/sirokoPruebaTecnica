@@ -19,7 +19,6 @@ final class ShoppingCartController extends AbstractController
 {
     public function __construct(
         private CacheInterface $cache,
-        private CacheItemPoolInterface $cacheItemPool,
     )
     {
     }
@@ -30,10 +29,8 @@ final class ShoppingCartController extends AbstractController
         try {
             $clientUUID = $request->client_uuid;
 
-            ShoppingCartUtils::getCreateCart($clientUUID, $this->cache);
-            $cart = $this->cacheItemPool->getItem($clientUUID)->get();
-
-            return new JsonResponse($cart);
+            $cart = ShoppingCartUtils::getCart($clientUUID, $this->cache);
+            return new JsonResponse($cart->toArray());
         }catch (Exception | \TypeError | ValidationFailedException | ValidatorException | HttpException $exception){
             return new JsonResponse([$exception->getMessage()], 400);
         }

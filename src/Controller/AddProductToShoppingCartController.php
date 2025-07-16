@@ -27,9 +27,9 @@ final class AddProductToShoppingCartController extends AbstractController
     {
         try {
             $clientUUID = $request->client_uuid;
-            ShoppingCartUtils::addOrUpdateItem($clientUUID, $request->product, $this->cacheItemPool);
-            $cart = $this->cacheItemPool->getItem($clientUUID)->get();
-            return new JsonResponse($cart);
+            $shoppingCart = ShoppingCartUtils::addOrUpdateItem($clientUUID, $request->product, $this->cacheItemPool);
+
+            return new JsonResponse($shoppingCart->toArray());
         }catch (Exception | \TypeError | ValidationFailedException | ValidatorException | HttpException $exception)
         {
             return new JsonResponse($exception->getMessage(), 400);
