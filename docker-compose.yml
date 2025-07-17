@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   php:
     build:
@@ -14,11 +12,6 @@ services:
       - .:/app
       - .:/var/www/symfony
     working_dir: /app
-
-  redis:
-    image: redis:7-alpine
-    ports:
-      - "6379:6379"
 
 ###> doctrine/doctrine-bundle ###
   database:
