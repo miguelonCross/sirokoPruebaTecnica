@@ -47,4 +47,36 @@ class AddProductToShoppingCartControllerTest extends WebTestCase
         $this->assertEquals([$shoppingCartItem->toArray()], $response['products']);
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
     }
+
+    public function test_addingExistingProductShouldUpdateQuantity(): void
+    {
+        $client = static::createClient();
+        $container = static::getContainer();
+
+        $clientUUID = 'd8a9b999-65a7-41e3-b5ab-ddb30ef12d09';
+        $testCache = new ArrayAdapter();
+
+        $product = new Product(new Uuid('2a90c5d1-efee-449c-8134-2b3968bd0de8'), 'Casco Asic', 1099, 'Casco ciclista de Asics', 'cyclism');
+        $shoppingCartItem = new ShoppingCartItem($product, 3);
+
+        $item = $testCache->getItem($clientUUID)->set(['uuid' => '2a90c5d1-efee-449c-8134-2b3968bd0de8', 'products' =>  []]);
+        $testCache->save($item);
+
+        $container->set('cache.app', $testCache);
+
+        $body = json_encode(['client_uuid' => $clientUUID, 'product_uuid' => $product->getUuid()->toRfc4122(), 'quantity' =>  3]);
+        $client->request(
+            'POST',
+            '/shoppingCart/add',
+            [],
+            [],
+            ['CONTENT_TYPE' => 'application/json'],
+            $body
+        );
+
+        $response = json_decode($client->getResponse()->getContent(), true);
+
+        $this->assertEquals([$shoppingCartItem->toArray()], $response['products']);
+        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+    }
 }

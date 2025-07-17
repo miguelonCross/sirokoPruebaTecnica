@@ -29,9 +29,9 @@ class ShoppingCartControllerTest extends WebTestCase
 
         $shoppingCartItem = new ShoppingCartItem($product, 2);
 
-        $shoppingCart = new ShoppingCartDTO('2a90c5d1-efee-449c-8134-2b3968bd0de8', [$shoppingCartItem->toArray()]);
+        $shoppingCart = new ShoppingCartDTO('2a90c5d1-efee-449c-8134-2b3968bd0de8', [$shoppingCartItem]);
 
-        $item = $testCache->getItem($clientUUID)->set(['uuid' => '2a90c5d1-efee-449c-8134-2b3968bd0de8', 'products' =>  [$shoppingCartItem->toArray()]]);
+        $item = $testCache->getItem($clientUUID)->set(['uuid' => '2a90c5d1-efee-449c-8134-2b3968bd0de8', 'products' =>  [$shoppingCartItem]]);
         $testCache->save($item);
         $container->set('cache.app', $testCache);
 

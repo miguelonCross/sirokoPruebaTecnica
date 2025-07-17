@@ -27,7 +27,7 @@ class RemoveProductFromShoppingCartControllerTest extends WebTestCase
         $product = new Product(new Uuid('2a90c5d1-efee-449c-8134-2b3968bd0de8'), 'Casco Asic', 1099, 'Casco ciclista de Asics', 'cyclism');
         $shoppingCartItem = new ShoppingCartItem($product, 2);
 
-        $item = $testCache->getItem($clientUUID)->set(['uuid' => '2a90c5d1-efee-449c-8134-2b3968bd0de8', 'products' =>  [$shoppingCartItem->toArray()]]);
+        $item = $testCache->getItem($clientUUID)->set(['uuid' => '2a90c5d1-efee-449c-8134-2b3968bd0de8', 'products' =>  [$shoppingCartItem]]);
         $testCache->save($item);
         $container->set('cache.app', $testCache);
 
