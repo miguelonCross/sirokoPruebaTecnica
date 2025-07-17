@@ -6,11 +6,14 @@ use Symfony\Component\Uid\Uuid;
 
 class Order
 {
+    /**
+     * @param ShoppingCartItem[] $shoppingCart
+     */
     public function __construct(
         private Uuid $uuid,
         private int $amount,
         private Uuid $clientUUID,
-        private ShoppingCart $shoppingCart,
+        private array $shoppingCart,
     )
     {
     }
@@ -30,18 +33,26 @@ class Order
         return $this->clientUUID;
     }
 
-    public function getShoppingCart(): ShoppingCart
+    /**
+     * @return ShoppingCartItem[]
+     */
+    public function getShoppingCartItem(): array
     {
         return $this->shoppingCart;
     }
 
     public function toArray(): array
     {
+        $items = [];
+        foreach ($this->getShoppingCartItem() as $item) {
+            $items[] = $item->toArray();
+        }
+
         return [
             'uuid' => $this->getUuid(),
             'amount' => $this->getAmount(),
             'clientUUID' => $this->getClientUUID(),
-            'shoppingCart' => $this->getShoppingCart()->toArray(),
+            'items' => $items,
         ];
     }
 

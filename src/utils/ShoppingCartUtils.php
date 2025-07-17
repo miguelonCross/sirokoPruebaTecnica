@@ -3,6 +3,7 @@
 namespace App\utils;
 
 use App\dto\ShoppingCartDTO;
+use App\Entity\ShoppingCart;
 use App\Entity\ShoppingCartItem;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Uid\Uuid;
@@ -55,7 +56,7 @@ class ShoppingCartUtils
         $cache->delete($clientUUID->toRfc4122());
     }
 
-    public static function getCart(Uuid $clientUUID, CacheInterface $cache): ShoppingCartDTO
+    public static function getCart(Uuid $clientUUID, CacheInterface $cache): ShoppingCart
     {
         $cart = $cache->get($clientUUID, function (ItemInterface $item) {
 
@@ -70,7 +71,7 @@ class ShoppingCartUtils
             ];
         });
 
-        return new ShoppingCartDTO($cart['uuid'], $cart['products']);
+        return new ShoppingCart($cart['uuid'], $cart['products']);
     }
 
     public static function deleteItem(Uuid $clientUUID, string $productUUID, CacheItemPoolInterface $cacheItemPool): bool | null

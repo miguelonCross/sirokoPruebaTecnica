@@ -2,6 +2,7 @@
 
 namespace App\Controller\ShoppingCartController;
 
+use App\dto\ShoppingCartDTO;
 use App\utils\ShoppingCartUtils;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -29,7 +30,7 @@ final class ShoppingCartController extends AbstractController
             $clientUUID = $request->client_uuid;
 
             $cart = ShoppingCartUtils::getCart(new Uuid($clientUUID), $this->cache);
-            return new JsonResponse($cart->toArray());
+            return new JsonResponse((new ShoppingCartDTO($cart->getUuid(), $cart->getShoppingCartItem()))->toArray());
         }catch (Exception | \TypeError | ValidationFailedException | ValidatorException | HttpException $exception){
             return new JsonResponse([$exception->getMessage()], 400);
         }
