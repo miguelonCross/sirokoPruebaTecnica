@@ -1,8 +1,7 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\RemoveProductFromShoppingCartController;
 
-use App\dto\RemoveProductoFromShoppingCartRequest;
 use App\utils\ShoppingCartUtils;
 use Exception;
 use Psr\Cache\CacheItemPoolInterface;
@@ -11,6 +10,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Validator\Exception\ValidationFailedException;
 use Symfony\Component\Validator\Exception\ValidatorException;
 
@@ -23,13 +23,13 @@ final class RemoveProductFromShoppingCartController extends AbstractController
     }
 
     #[Route('/shoppingCart/remove', name: 'app_remove_product_from_shopping_cart', methods: ['DELETE'])]
-    public function index(#[MapRequestPayload] RemoveProductoFromShoppingCartRequest $request): JsonResponse
+    public function index(#[MapRequestPayload] RemoveProductFromShoppingCartControllerRequest $request): JsonResponse
     {
         try {
             $clientUUID = $request->client_uuid;
-            $productCode = $request->code;
+            $productCode = $request->product_uuid;
 
-            $isDeleted = ShoppingCartUtils::deleteProduct($clientUUID, $productCode, $this->cacheItemPool);
+            $isDeleted = ShoppingCartUtils::deleteItem(new Uuid($clientUUID), $productCode, $this->cacheItemPool);
 
             if (is_null($isDeleted)){
                 return new JsonResponse(['message' => 'Shopping cart not found'], 404);

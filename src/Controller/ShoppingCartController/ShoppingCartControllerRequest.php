@@ -1,11 +1,10 @@
 <?php
 
-namespace App\dto;
+namespace App\Controller\ShoppingCartController;
 
 use Symfony\Component\Validator\Constraints as Assert;
 
-
-class ShoppingCartRequest
+class ShoppingCartControllerRequest
 {
     public function __construct(
         #[Assert\NotBlank]

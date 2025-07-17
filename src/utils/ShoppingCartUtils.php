@@ -2,74 +2,104 @@
 
 namespace App\utils;
 
-use App\Entity\ShoppingCart;
-use App\Entity\ShoppingCartProduct;
+use App\dto\ShoppingCartDTO;
+use App\Entity\ShoppingCartItem;
 use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Component\Uid\Uuid;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 
 class ShoppingCartUtils
 {
-    public static function addOrUpdateItem(string $clientUUID, ShoppingCartProduct $item, CacheItemPoolInterface $cacheItemPool): ShoppingCart
+    public function __construct(
+    )
+    {
+    }
+
+    public static function addOrUpdateItem(Uuid $clientUUID, ShoppingCartItem $item, CacheItemPoolInterface $cacheItemPool): ShoppingCartDTO
     {
         $isProductInCartAlready = false;
-        $cacheItem = $cacheItemPool->getItem($clientUUID);
-        $cart = $cacheItem->isHit() ? $cacheItem->get() : [];
-       for ($i = 0; $i < count($cart); $i++) {
-               if ($cart[$i]['code'] === $item->getCode()){
-                   if ($item->getQuantity() === 0){
-                   unset($cart[$i]);
+
+        $cacheItem = $cacheItemPool->getItem($clientUUID->toRfc4122());
+        $cart = $cacheItem->isHit() ? $cacheItem->get() : ['uuid' => Uuid::v4(),'products' => []];
+
+        /**
+         * @var ShoppingCartItem[] $productsInCart
+         */
+        $productsInCart = $cart['products'];
+
+       for ($i = 0; $i < count($productsInCart); $i++) {
+           if ($productsInCart[$i]->getProduct()->getUuid() == $item->getProduct()->getUuid()->toRfc4122()){
+               if ($item->getQuantity() === 0){
+                   unset($productsInCart[$i]);
                } else {
-                   $cart[$i] = $item->toArray();
+                   $productsInCart[$i] = $item;
                }
                $isProductInCartAlready = true;
            }
        }
+
        if (!$isProductInCartAlready && $item->getQuantity() > 0){
-           $cart[] = $item->toArray();
+           $productsInCart[] = $item;
        }
+       $cart['products'] = $productsInCart;
 
-        $cacheItem->set($cart);
-        $cacheItemPool->save($cacheItem);
+       $cacheItem->set($cart);
+       $cacheItemPool->save($cacheItem);
 
-        return ShoppingCart::toEntity($cart);
+        return new ShoppingCartDTO($cart['uuid'], $cart['products']);
     }
 
-    public static function deleteCart(string $clientUUID, CacheInterface $cache): void
+    public static function deleteCart(Uuid $clientUUID, CacheInterface $cache): void
     {
-        $cache->delete($clientUUID);
+        $cache->delete($clientUUID->toRfc4122());
     }
 
-    public static function getCart(string $clientUUID, CacheInterface $cache): ShoppingCart
+    public static function getCart(Uuid $clientUUID, CacheInterface $cache): ShoppingCartDTO
     {
         $cart = $cache->get($clientUUID, function (ItemInterface $item) {
+
+            /**
+             * @var ShoppingCartItem[] $shoppingCartItems
+             */
+            $shoppingCartItems = [];
             $item->expiresAfter(3600);
-            return [];
+            return [
+                'uuid' => Uuid::v4(),
+                'products' => $shoppingCartItems
+            ];
         });
 
-        return ShoppingCart::toEntity($cart);
+        return new ShoppingCartDTO($cart['uuid'], $cart['products']);
     }
 
-    public static function deleteItem(string $clientUUID, ShoppingCartProduct $item, CacheItemPoolInterface $cacheItemPool): ShoppingCart
+    public static function deleteItem(Uuid $clientUUID, string $productUUID, CacheItemPoolInterface $cacheItemPool): bool | null
     {
-        $cacheItem = $cacheItemPool->getItem($clientUUID);
-        $cart = $cacheItem->isHit() ? $cacheItem->get() : [];
-        return ShoppingCart::toEntity($cart);
-    }
-
-    public static function deleteProduct(string $clientUUID, string $productCode, CacheItemPoolInterface $cacheItemPool): bool | null
-    {
-        $cacheItem = $cacheItemPool->getItem($clientUUID);
+        $cacheItem = $cacheItemPool->getItem($clientUUID->toRfc4122());
+        $isDeletedItem = false;
 
         if($cacheItem->isHit()){
             $cart = $cacheItem->get();
-            for ($i = 0; $i < count($cart); $i++) {
-                if ($cart[$i]['code'] === $productCode){
-                    unset($cart[$i]);
-                    return true;
+
+            /**
+             * @var ShoppingCartItem[] $productsInCart
+             */
+            $productsInCart = $cart['products'];
+
+            $remainingProducts = [];
+            for ($i = 0; $i < count($productsInCart); $i++) {
+                if ($productsInCart[$i]->getProduct()->getUuid()->toRfc4122() === $productUUID){
+                    $isDeletedItem = true;
+                } else {
+                    $remainingProducts[] = $productsInCart[$i];
                 }
             }
-            return false;
+
+            $cart['products'] = $remainingProducts;
+            $cacheItem->set($cart);
+            $cacheItemPool->save($cacheItem);
+
+            return $isDeletedItem;
         }
         return null;
     }

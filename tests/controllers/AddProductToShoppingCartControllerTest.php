@@ -2,8 +2,11 @@
 
 namespace App\Tests\controllers;
 
-use App\Entity\ShoppingCartProduct;
+use App\Entity\Product;
+use App\Entity\ShoppingCartItem;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\Uid\Uuid;
 
 class AddProductToShoppingCartControllerTest extends WebTestCase
 {
@@ -16,10 +19,20 @@ class AddProductToShoppingCartControllerTest extends WebTestCase
     public function test_givenClientUUIDShouldReturnOK(): void
     {
         $client = static::createClient();
+        $container = static::getContainer();
 
-        $product = (new ShoppingCartProduct('my-code', 1, 1000))->toArray();
+        $clientUUID = 'd8a9b999-65a7-41e3-b5ab-ddb30ef12d09';
+        $testCache = new ArrayAdapter();
 
-        $body = json_encode(['client_uuid' => 'd8a9b999-65a7-41e3-b5ab-ddb30ef12d09', 'product' => $product]);
+        $product = new Product(new Uuid('2a90c5d1-efee-449c-8134-2b3968bd0de8'), 'Casco Asic', 1099, 'Casco ciclista de Asics', 'cyclism');
+        $shoppingCartItem = new ShoppingCartItem($product, 2);
+
+        $item = $testCache->getItem($clientUUID)->set(['uuid' => '2a90c5d1-efee-449c-8134-2b3968bd0de8', 'products' =>  []]);
+        $testCache->save($item);
+
+        $container->set('cache.app', $testCache);
+
+        $body = json_encode(['client_uuid' => $clientUUID, 'product_uuid' => $product->getUuid()->toRfc4122(), 'quantity' =>  2]);
         $client->request(
             'POST',
             '/shoppingCart/add',
@@ -29,7 +42,9 @@ class AddProductToShoppingCartControllerTest extends WebTestCase
             $body
         );
 
-        $this->assertEquals([$product], json_decode($client->getResponse()->getContent(), true));
+        $response = json_decode($client->getResponse()->getContent(), true);
+
+        $this->assertEquals([$shoppingCartItem->toArray()], $response['products']);
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
     }
 }

@@ -1,18 +1,15 @@
 <?php
 
-namespace App\dto;
+namespace App\Controller\DeleteShoppingCartController;
 
-use App\Entity\ShoppingCartProduct;
 use Symfony\Component\Validator\Constraints as Assert;
 
-class AddProductToShoppingCartRequest {
-
+class DeleteShoppingCartControllerRequest
+{
     public function __construct(
         #[Assert\NotBlank]
         #[Assert\Uuid]
         public readonly string $client_uuid,
-
-        public readonly ShoppingCartProduct $product,
     )
     {
     }
