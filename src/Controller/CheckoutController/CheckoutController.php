@@ -24,8 +24,10 @@ class CheckoutController extends AbstractController
     public function execute(#[MapRequestPayload] CheckoutControllerRequest $request): JsonResponse
     {
         try {
-            $order = $this->checkoutProcess->execute(new CheckoutProcessRequest(new Uuid($request->client_uuid), $request->pan, $request->holder, $request->address))->order;
+            $order = $this->checkoutProcess->execute(new CheckoutProcessRequest(new Uuid($request->order_uuid), $request->pan, $request->holder, $request->address))->order;
             if (!is_null($order)) {
+                var_dump($order);
+
                 return new JsonResponse((new OrderDTO($order))->toArray());
             }
 

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\UseCase\UpdateOrderStatusByUUID;
+namespace App\UseCase\GetOrderByUUID;
 
 use App\Entity\Order;
 use App\Entity\Product;
@@ -11,17 +11,13 @@ use App\Entity\ShoppingCartItem;
 use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Uid\UuidV4;
 
-class UpdateOrderStatusByUUID
+class GetOrderByUUID
 {
-    public function execute(UpdateOrderStatusByUUIDRequest $request): UpdateOrderStatusByUUIDResponse
+    public function execute(GetOrderByUUIDRequest $request): GetOrderByUUIDResponse
     {
-        $ordersFile = file_get_contents(__DIR__.'/../../mocks/orders.json');
+        $ordersFile = $this->loadJson();
         $data = json_decode((string) $ordersFile, true, JSON_THROW_ON_ERROR);
-
-        var_dump($ordersFile);
-
-        $orders = [];
-        $updatedOrder = null;
+        $order = null;
 
         for ($i = 0; $i < count($data); ++$i) {
             $actualOrder = $data[$i];
@@ -43,21 +39,21 @@ class UpdateOrderStatusByUUID
                     );
                 }
 
-                $updatedOrder = new Order(
+                $order = new Order(
                     $request->orderUUID,
                     $actualOrder['amount'],
                     new Uuid($actualOrder['client_uuid']),
                     new ShoppingCart(new UuidV4($shoppingCart['uuid']), $products),
-                    $request->status,
+                    $actualOrder['status'],
                 );
-                $orders[] = $updatedOrder->toArray();
-            } else {
-                $orders[] = $actualOrder;
             }
         }
 
-        file_put_contents(__DIR__.'/../../mocks/orders.json', (string) json_encode($orders), LOCK_EX);
+        return new GetOrderByUUIDResponse($order);
+    }
 
-        return new UpdateOrderStatusByUUIDResponse($updatedOrder);
+    protected function loadJson(): string
+    {
+        return file_get_contents(__DIR__.'/../../mocks/orders.json');
     }
 }

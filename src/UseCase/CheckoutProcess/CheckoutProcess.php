@@ -6,8 +6,8 @@ namespace App\UseCase\CheckoutProcess;
 
 use App\Entity\PaymentRequest;
 use App\Entity\PaymentResponse;
-use App\UseCase\GenerateOrderByClientUUID\GenerateOrderByClientUUID;
-use App\UseCase\GenerateOrderByClientUUID\GenerateOrderByClientUUIDRequest;
+use App\UseCase\GetOrderByUUID\GetOrderByUUID;
+use App\UseCase\GetOrderByUUID\GetOrderByUUIDRequest;
 use App\UseCase\UpdateOrderStatusByUUID\UpdateOrderStatusByUUID;
 use App\UseCase\UpdateOrderStatusByUUID\UpdateOrderStatusByUUIDRequest;
 use Symfony\Component\Uid\Uuid;
@@ -15,14 +15,14 @@ use Symfony\Component\Uid\Uuid;
 class CheckoutProcess
 {
     public function __construct(
-        private GenerateOrderByClientUUID $generateOrderByClientUUID,
         private UpdateOrderStatusByUUID $updatedOrderStatusByUUID,
+        private GetOrderByUUID $getOrderByUUID,
     ) {
     }
 
     public function execute(CheckoutProcessRequest $request): CheckoutProcessResponse
     {
-        $order = $this->generateOrderByClientUUID->execute(new GenerateOrderByClientUUIDRequest($request->clientUUID))->order;
+        $order = $this->getOrderByUUID->execute(new GetOrderByUUIDRequest($request->orderUUID))->order;
 
         if (!is_null($order)) {
             /**

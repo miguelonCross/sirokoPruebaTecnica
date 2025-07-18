@@ -11,7 +11,7 @@ class CheckoutControllerRequest
     public function __construct(
         #[Assert\NotBlank]
         #[Assert\Uuid]
-        public readonly string $client_uuid,
+        public readonly string $order_uuid,
 
         #[Assert\NotBlank]
         #[Assert\Type('string')]

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\controllers;
+namespace App\Tests\controllers\ShoppingCartControllerTest;
 
 use App\dto\ShoppingCartDTO;
 use App\Entity\Product;
