@@ -1,0 +1,25 @@
+{
+  "products": [
+    {
+      "uuid": "2a90c5d1-efee-449c-8134-2b3968bd0de8",
+      "description": "Casco ciclista de Asics",
+      "name": "Casco Asic",
+      "price": 1099,
+      "category": "cyclism"
+    },
+    {
+      "uuid": "2a90c5d1-efee-449c-8134-2b3968bd0de3",
+      "description": "Zapatillas de running Asic ",
+      "name": "Asic V1 Pro",
+      "price": 8099,
+      "category": "running"
+    },
+    {
+      "uuid": "2a90c5d1-efee-449c-8134-2b3968bd0de2",
+      "description": "Zapatillas Rebook estilo casual",
+      "name": "Rebook Casual Black",
+      "price": 5099,
+      "category": "casual"
+    }
+  ]
+}

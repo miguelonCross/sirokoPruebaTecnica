@@ -3,8 +3,7 @@ FROM php:8.2-cli
 # Instala dependencias necesarias
 RUN apt-get update && apt-get install -y \
     git unzip libpq-dev libzip-dev zip libonig-dev \
-    && docker-php-ext-install pdo pdo_mysql zip \
-    && pecl install redis && docker-php-ext-enable redis
+    && docker-php-ext-install pdo pdo_mysql zip
 
 
 # Instala Composer
