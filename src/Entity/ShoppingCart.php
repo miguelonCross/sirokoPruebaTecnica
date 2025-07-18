@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
-use Symfony\Component\Uid\Uuid;
+use Symfony\Component\Uid\UuidV4;
 
 class ShoppingCart
 {
@@ -10,22 +12,8 @@ class ShoppingCart
      * @param ShoppingCartItem[] $shoppingCartItem
      */
     public function __construct(
-        private Uuid $uuid,
-        private array $shoppingCartItem,
-    )
-    {
-    }
-
-    public function getUuid(): Uuid
-    {
-        return $this->uuid;
-    }
-
-    /**
-     * @return ShoppingCartItem[]
-     */
-    public function getShoppingCartItem(): array
-    {
-        return $this->shoppingCartItem;
+        public readonly UuidV4 $uuid,
+        public readonly array $shoppingCartItem,
+    ) {
     }
 }

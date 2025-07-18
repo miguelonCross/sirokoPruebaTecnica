@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\dto;
 
 use App\Entity\ShoppingCartItem;
@@ -10,33 +12,23 @@ class ShoppingCartDTO
      * @param ShoppingCartItem[] $shoppingCartItems
      */
     public function __construct(
-        private string $shoppingCartUuid,
-        private array $shoppingCartItems,
-    )
-    {
-    }
-
-    public function getShoppingCartUuid(): string
-    {
-        return $this->shoppingCartUuid;
+        public readonly string $shoppingCartUuid,
+        public readonly array $shoppingCartItems,
+    ) {
     }
 
     /**
-     * @return ShoppingCartItem[]
+     * @return array<mixed>
      */
-    public function getShoppingCartItems(): array
-    {
-        return $this->shoppingCartItems;
-    }
-
     public function toArray(): array
     {
         $products = [];
-        foreach ($this->getShoppingCartItems() as $shoppingCartItem) {
+        foreach ($this->shoppingCartItems as $shoppingCartItem) {
             $products[] = $shoppingCartItem->toArray();
         }
+
         return [
-            'uuid' => $this->getShoppingCartUuid(),
+            'uuid' => $this->shoppingCartUuid,
             'products' => $products,
         ];
     }

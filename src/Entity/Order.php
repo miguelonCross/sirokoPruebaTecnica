@@ -1,59 +1,41 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use Symfony\Component\Uid\Uuid;
 
 class Order
 {
-    /**
-     * @param ShoppingCartItem[] $shoppingCart
-     */
     public function __construct(
-        private Uuid $uuid,
-        private int $amount,
-        private Uuid $clientUUID,
-        private array $shoppingCart,
-    )
-    {
-    }
-
-    public function getUuid(): Uuid
-    {
-        return $this->uuid;
-    }
-
-    public function getAmount(): int
-    {
-        return $this->amount;
-    }
-
-    public function getClientUUID(): Uuid
-    {
-        return $this->clientUUID;
+        public readonly Uuid $uuid,
+        public readonly int $amount,
+        public readonly Uuid $clientUUID,
+        public readonly ShoppingCart $shoppingCart,
+        public readonly string $status,
+    ) {
     }
 
     /**
-     * @return ShoppingCartItem[]
+     * @return array<mixed>
      */
-    public function getShoppingCartItem(): array
-    {
-        return $this->shoppingCart;
-    }
-
     public function toArray(): array
     {
         $items = [];
-        foreach ($this->getShoppingCartItem() as $item) {
+        foreach ($this->shoppingCart->shoppingCartItem as $item) {
             $items[] = $item->toArray();
         }
 
         return [
-            'uuid' => $this->getUuid(),
-            'amount' => $this->getAmount(),
-            'clientUUID' => $this->getClientUUID(),
-            'items' => $items,
+            'uuid' => $this->uuid,
+            'amount' => $this->amount,
+            'client_uuid' => $this->clientUUID,
+            'shopping_cart' => [
+                'uuid' => $this->shoppingCart->uuid,
+                'items' => $items,
+            ],
+            'status' => $this->status,
         ];
     }
-
 }
