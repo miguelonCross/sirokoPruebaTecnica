@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller\AddProductToShoppingCartController;
 
 use Symfony\Component\Validator\Constraints as Assert;
 
-class AddProductToShoppingCartControllerRequest {
-
+class AddProductToShoppingCartControllerRequest
+{
     public function __construct(
         #[Assert\NotBlank]
         #[Assert\Uuid]
@@ -19,7 +21,6 @@ class AddProductToShoppingCartControllerRequest {
         #[Assert\GreaterThan(0)]
         #[Assert\Type('integer')]
         public readonly int $quantity,
-    )
-    {
+    ) {
     }
 }

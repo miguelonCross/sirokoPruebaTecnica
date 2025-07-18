@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller\RemoveProductFromShoppingCartController;
 
 use Symfony\Component\Validator\Constraints as Assert;
@@ -14,7 +16,6 @@ class RemoveProductFromShoppingCartControllerRequest
         #[Assert\NotBlank]
         #[Assert\Uuid]
         public readonly string $product_uuid,
-    )
-    {
+    ) {
     }
 }

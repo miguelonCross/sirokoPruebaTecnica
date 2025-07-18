@@ -1,9 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller\RemoveProductFromShoppingCartController;
 
 use App\utils\ShoppingCartUtils;
-use Exception;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -18,8 +19,7 @@ final class RemoveProductFromShoppingCartController extends AbstractController
 {
     public function __construct(
         private CacheItemPoolInterface $cacheItemPool,
-    )
-    {
+    ) {
     }
 
     #[Route('/shoppingCart/remove', name: 'app_remove_product_from_shopping_cart', methods: ['DELETE'])]
@@ -31,15 +31,14 @@ final class RemoveProductFromShoppingCartController extends AbstractController
 
             $isDeleted = ShoppingCartUtils::deleteItem(new Uuid($clientUUID), $productCode, $this->cacheItemPool);
 
-            if (is_null($isDeleted)){
+            if (is_null($isDeleted)) {
                 return new JsonResponse(['message' => 'Shopping cart not found'], 404);
-            } elseif (!$isDeleted){
+            } elseif (!$isDeleted) {
                 return new JsonResponse(['message' => 'Product not found in shopping cart'], 404);
             } else {
                 return new JsonResponse(['message' => 'Product removed'], 200);
             }
-        }catch (Exception | \TypeError | ValidationFailedException | ValidatorException | HttpException $exception)
-        {
+        } catch (\Exception|\TypeError|ValidationFailedException|ValidatorException|HttpException $exception) {
             return new JsonResponse($exception->getMessage(), 400);
         }
     }

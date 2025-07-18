@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Tests\controllers;
 
 use App\Entity\Product;
@@ -10,14 +12,14 @@ use Symfony\Component\Uid\Uuid;
 
 class RemoveProductFromShoppingCartControllerTest extends WebTestCase
 {
-    public function test_givenEmptyFieldsShouldReturnBadRequest(): void
+    public function testGivenEmptyFieldsShouldReturnBadRequest(): void
     {
         $client = static::createClient();
         $client->request('DELETE', '/shoppingCart/remove');
         $this->assertEquals(422, $client->getResponse()->getStatusCode());
     }
 
-    public function test_givenEmptyFieldsShouldReturnOK(): void
+    public function testGivenEmptyFieldsShouldReturnOK(): void
     {
         $client = static::createClient();
         $container = static::getContainer();
@@ -27,17 +29,17 @@ class RemoveProductFromShoppingCartControllerTest extends WebTestCase
         $product = new Product(new Uuid('2a90c5d1-efee-449c-8134-2b3968bd0de8'), 'Casco Asic', 1099, 'Casco ciclista de Asics', 'cyclism');
         $shoppingCartItem = new ShoppingCartItem($product, 2);
 
-        $item = $testCache->getItem($clientUUID)->set(['uuid' => '2a90c5d1-efee-449c-8134-2b3968bd0de8', 'products' =>  [$shoppingCartItem]]);
+        $item = $testCache->getItem($clientUUID)->set(['uuid' => '2a90c5d1-efee-449c-8134-2b3968bd0de8', 'products' => [$shoppingCartItem]]);
         $testCache->save($item);
         $container->set('cache.app', $testCache);
 
-        $client->request('DELETE', '/shoppingCart/remove', ['client_uuid' => '45659fae-eb17-4c11-b980-988b77c511bc', 'product_uuid' => $product->getUuid()->toRfc4122()]);
+        $client->request('DELETE', '/shoppingCart/remove', ['client_uuid' => '45659fae-eb17-4c11-b980-988b77c511bc', 'product_uuid' => $product->uuid->toRfc4122()]);
 
         $this->assertEquals('{"message":"Product removed"}', $client->getResponse()->getContent());
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
     }
 
-    public function test_givenClientUUIDShoppingCartNotCreatedShouldReturnNotFound(): void
+    public function testGivenClientUUIDShoppingCartNotCreatedShouldReturnNotFound(): void
     {
         $client = static::createClient();
         $container = static::getContainer();
@@ -45,7 +47,7 @@ class RemoveProductFromShoppingCartControllerTest extends WebTestCase
         $clientUUID = '45659fae-eb17-4c11-b980-988b77c511bc';
         $testCache = new ArrayAdapter();
 
-        $item = $testCache->getItem($clientUUID)->set(['uuid' => '2a90c5d1-efee-449c-8134-2b3968bd0de8', 'products' =>  []]);
+        $item = $testCache->getItem($clientUUID)->set(['uuid' => '2a90c5d1-efee-449c-8134-2b3968bd0de8', 'products' => []]);
 
         $testCache->save($item);
         $container->set('cache.app', $testCache);
@@ -56,7 +58,7 @@ class RemoveProductFromShoppingCartControllerTest extends WebTestCase
         $this->assertEquals(404, $client->getResponse()->getStatusCode());
     }
 
-    public function test_givenClientUUIDShoppingCartNotFoundShouldReturnNotFound(): void
+    public function testGivenClientUUIDShoppingCartNotFoundShouldReturnNotFound(): void
     {
         $client = static::createClient();
         $container = static::getContainer();
@@ -64,7 +66,7 @@ class RemoveProductFromShoppingCartControllerTest extends WebTestCase
         $clientUUID = '45659fae-eb17-4c11-b980-988b77c511bc';
         $testCache = new ArrayAdapter();
 
-        $item = $testCache->getItem($clientUUID)->set(['uuid' => '2a90c5d1-efee-449c-8134-2b3968bd0de8', 'products' =>  []]);
+        $item = $testCache->getItem($clientUUID)->set(['uuid' => '2a90c5d1-efee-449c-8134-2b3968bd0de8', 'products' => []]);
         $testCache->save($item);
         $container->set('cache.app', $testCache);
 
