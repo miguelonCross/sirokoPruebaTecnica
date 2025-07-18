@@ -8,12 +8,15 @@ use App\Entity\Order;
 use App\Entity\ShoppingCart;
 use App\UseCase\GetShoppingCartByClientUUID\GetShoppingCartByClientUUID;
 use App\UseCase\GetShoppingCartByClientUUID\GetShoppingCartByClientUUIDRequest;
+use App\utils\ShoppingCartUtils;
 use Symfony\Component\Uid\UuidV4;
+use Symfony\Contracts\Cache\CacheInterface;
 
 class GenerateOrderByClientUUID
 {
     public function __construct(
         private GetShoppingCartByClientUUID $getShoppingCartByClientUUID,
+        private CacheInterface $cache,
     ) {
     }
 
@@ -22,7 +25,7 @@ class GenerateOrderByClientUUID
         $order = null;
         $shoppingCart = $this->getShoppingCartByClientUUID->execute(new GetShoppingCartByClientUUIDRequest($request->clientUUID))->shoppingCart;
 
-        if (!empty($shoppingCart->shoppingCartItem)) {
+        if (!empty($shoppingCart->shoppingCartItems)) {
             $amount = $this->calculateTotalAmount($shoppingCart);
 
             $order = new Order(UuidV4::v4(), $amount, $request->clientUUID, $shoppingCart, 'CREATED');
@@ -36,6 +39,8 @@ class GenerateOrderByClientUUID
             if (false === $isReaded) {
                 throw new \Exception('Unable to write orders.json');
             }
+
+            ShoppingCartUtils::deleteCart($request->clientUUID, $this->cache);
         }
 
         return new GenerateOrderByClientUUIDResponse($order);
@@ -43,7 +48,7 @@ class GenerateOrderByClientUUID
 
     private function calculateTotalAmount(ShoppingCart $shoppingCart): int
     {
-        $items = $shoppingCart->shoppingCartItem;
+        $items = $shoppingCart->shoppingCartItems;
         $amount = 0;
 
         foreach ($items as $item) {

@@ -29,7 +29,7 @@ class ShoppingCartDTO
 
         return [
             'uuid' => $this->shoppingCartUuid,
-            'products' => $products,
+            'items' => $products,
         ];
     }
 }

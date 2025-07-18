@@ -30,4 +30,18 @@ class Product
             'category' => $this->category,
         ];
     }
+
+    /**
+     * @param array<mixed> $data
+     */
+    public static function toEntity(array $data): Product
+    {
+        return new Product(
+            new Uuid($data['uuid']),
+            $data['name'],
+            $data['price'],
+            $data['description'],
+            $data['category'],
+        );
+    }
 }

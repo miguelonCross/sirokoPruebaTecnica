@@ -26,8 +26,8 @@ final class ShoppingCartController extends AbstractController
         try {
             $shoppingCart = $this->getShoppingCartByClientUUID->execute(new GetShoppingCartByClientUUIDRequest(new Uuid($request->client_uuid)))->shoppingCart;
 
-            return new JsonResponse((new ShoppingCartDTO($shoppingCart->uuid->toRfc4122(), $shoppingCart->shoppingCartItem))->toArray());
-        }catch (\Exception $exception){
+            return new JsonResponse((new ShoppingCartDTO($shoppingCart->uuid->toRfc4122(), $shoppingCart->shoppingCartItems))->toArray());
+        } catch (\Exception $exception) {
             return new JsonResponse(['error' => $exception->getMessage()], 400);
         }
     }

@@ -23,14 +23,14 @@ class Order
     public function toArray(): array
     {
         $items = [];
-        foreach ($this->shoppingCart->shoppingCartItem as $item) {
+        foreach ($this->shoppingCart->shoppingCartItems as $item) {
             $items[] = $item->toArray();
         }
 
         return [
-            'uuid' => $this->uuid,
+            'uuid' => $this->uuid->toRfc4122(),
             'amount' => $this->amount,
-            'client_uuid' => $this->clientUUID,
+            'client_uuid' => $this->clientUUID->toRfc4122(),
             'shopping_cart' => [
                 'uuid' => $this->shoppingCart->uuid,
                 'items' => $items,

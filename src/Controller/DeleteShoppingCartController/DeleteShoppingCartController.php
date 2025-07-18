@@ -26,7 +26,7 @@ class DeleteShoppingCartController extends AbstractController
             ShoppingCartUtils::deleteCart(new Uuid($request->client_uuid), $this->cache);
 
             return new JsonResponse();
-        }catch (\Exception $exception){
+        } catch (\Exception $exception) {
             return new JsonResponse(['error' => $exception->getMessage()], 400);
         }
     }

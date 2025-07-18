@@ -30,7 +30,7 @@ class AddProductToShoppingCartControllerTest extends WebTestCase
         $product = new Product(new Uuid('2a90c5d1-efee-449c-8134-2b3968bd0de8'), 'Casco Asic', 1099, 'Casco ciclista de Asics', 'cyclism');
         $shoppingCartItem = new ShoppingCartItem($product, 2);
 
-        $item = $testCache->getItem($clientUUID)->set(['uuid' => '2a90c5d1-efee-449c-8134-2b3968bd0de8', 'products' => []]);
+        $item = $testCache->getItem($clientUUID)->set(['uuid' => '2a90c5d1-efee-449c-8134-2b3968bd0de8', 'items' => []]);
         $testCache->save($item);
 
         $container->set('cache.app', $testCache);
@@ -47,7 +47,7 @@ class AddProductToShoppingCartControllerTest extends WebTestCase
 
         $response = json_decode((string) $client->getResponse()->getContent(), true);
 
-        $this->assertEquals([$shoppingCartItem->toArray()], $response['products']);
+        $this->assertEquals([$shoppingCartItem->toArray()], $response['items']);
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
     }
 
@@ -62,7 +62,7 @@ class AddProductToShoppingCartControllerTest extends WebTestCase
         $product = new Product(new Uuid('2a90c5d1-efee-449c-8134-2b3968bd0de8'), 'Casco Asic', 1099, 'Casco ciclista de Asics', 'cyclism');
         $shoppingCartItem = new ShoppingCartItem($product, 3);
 
-        $item = $testCache->getItem($clientUUID)->set(['uuid' => '2a90c5d1-efee-449c-8134-2b3968bd0de8', 'products' => []]);
+        $item = $testCache->getItem($clientUUID)->set(['uuid' => '2a90c5d1-efee-449c-8134-2b3968bd0de8', 'items' => []]);
         $testCache->save($item);
 
         $container->set('cache.app', $testCache);
@@ -79,7 +79,7 @@ class AddProductToShoppingCartControllerTest extends WebTestCase
 
         $response = json_decode((string) $client->getResponse()->getContent(), true);
 
-        $this->assertEquals([$shoppingCartItem->toArray()], $response['products']);
+        $this->assertEquals([$shoppingCartItem->toArray()], $response['items']);
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
     }
 }

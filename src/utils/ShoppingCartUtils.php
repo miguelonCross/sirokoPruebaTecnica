@@ -23,12 +23,12 @@ class ShoppingCartUtils
         $isProductInCartAlready = false;
 
         $cacheItem = $cacheItemPool->getItem($clientUUID->toRfc4122());
-        $cart = $cacheItem->isHit() ? $cacheItem->get() : ['uuid' => Uuid::v4()->toRfc4122(), 'products' => []];
+        $cart = $cacheItem->isHit() ? $cacheItem->get() : ['uuid' => Uuid::v4()->toRfc4122(), 'items' => []];
 
         /**
          * @var ShoppingCartItem[] $productsInCart
          */
-        $productsInCart = $cart['products'];
+        $productsInCart = $cart['items'];
 
         for ($i = 0; $i < count($productsInCart); ++$i) {
             if ($productsInCart[$i]->product->uuid == $item->product->uuid->toRfc4122()) {
@@ -44,12 +44,12 @@ class ShoppingCartUtils
         if (!$isProductInCartAlready && $item->quantity > 0) {
             $productsInCart[] = $item;
         }
-        $cart['products'] = $productsInCart;
+        $cart['items'] = $productsInCart;
 
         $cacheItem->set($cart);
         $cacheItemPool->save($cacheItem);
 
-        return new ShoppingCartDTO($cart['uuid'], $cart['products']);
+        return new ShoppingCartDTO($cart['uuid'], $cart['items']);
     }
 
     public static function deleteCart(Uuid $clientUUID, CacheInterface $cache): void
@@ -76,7 +76,7 @@ class ShoppingCartUtils
 
             return [
                 'uuid' => Uuid::v4()->toRfc4122(),
-                'products' => $shoppingCartItems,
+                'items' => $shoppingCartItems,
             ];
         });
 
@@ -94,7 +94,7 @@ class ShoppingCartUtils
             /**
              * @var ShoppingCartItem[] $productsInCart
              */
-            $productsInCart = $cart['products'];
+            $productsInCart = $cart['items'];
 
             $remainingProducts = [];
             for ($i = 0; $i < count($productsInCart); ++$i) {
@@ -105,7 +105,7 @@ class ShoppingCartUtils
                 }
             }
 
-            $cart['products'] = $remainingProducts;
+            $cart['items'] = $remainingProducts;
             $cacheItem->set($cart);
             $cacheItemPool->save($cacheItem);
 
