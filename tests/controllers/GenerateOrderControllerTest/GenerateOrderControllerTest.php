@@ -30,7 +30,7 @@ class GenerateOrderControllerTest extends WebTestCase
 
         $shoppingCart = new ShoppingCartDTO('2a90c5d1-efee-449c-8134-2b3968bd0de8', [$shoppingCartItem]);
 
-        $item = $testCache->getItem($clientUUID)->set(['uuid' => '2a90c5d1-efee-449c-8134-2b3968bd0de8', 'items' => [$shoppingCartItem]]);
+        $item = $testCache->getItem($clientUUID)->set(new ShoppingCart(UuidV4::v4(), [$shoppingCartItem]));
         $testCache->save($item);
         $container->set('cache.app', $testCache);
 
@@ -61,7 +61,7 @@ class GenerateOrderControllerTest extends WebTestCase
         $clientUUID = '45659fae-eb17-4c11-b980-988b77c511bc';
         $testCache = new ArrayAdapter();
 
-        $item = $testCache->getItem($clientUUID)->set(['uuid' => '2a90c5d1-efee-449c-8134-2b3968bd0de8', 'items' => []]);
+        $item = $testCache->getItem($clientUUID)->set(new ShoppingCart(UuidV4::v4(), []));
         $testCache->save($item);
         $container->set('cache.app', $testCache);
 

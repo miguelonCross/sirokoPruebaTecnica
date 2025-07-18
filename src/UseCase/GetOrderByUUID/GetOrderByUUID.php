@@ -54,6 +54,6 @@ class GetOrderByUUID
 
     protected function loadJson(): string
     {
-        return file_get_contents(__DIR__.'/../../mocks/orders.json');
+        return (string) file_get_contents(__DIR__.'/../../mocks/orders.json');
     }
 }

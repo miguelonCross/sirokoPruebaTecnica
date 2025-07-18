@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller\AddProductToShoppingCartController;
 
+use App\dto\ShoppingCartDTO;
 use App\Entity\ShoppingCartItem;
 use App\UseCase\GetProductByUUID\GetProductByUUID;
 use App\UseCase\GetProductByUUID\GetProductByUUIDRequest;
@@ -39,7 +40,7 @@ final class AddProductToShoppingCartController extends AbstractController
 
                 $shoppingCart = ShoppingCartUtils::addOrUpdateItem($clientUUID, $shoppingCartItem, $this->cacheItemPool);
 
-                return new JsonResponse($shoppingCart->toArray());
+                return new JsonResponse((new ShoppingCartDTO($shoppingCart->uuid->toRfc4122(), $shoppingCart->shoppingCartItems))->toArray());
             }
 
             return new JsonResponse('Product not found', 404);

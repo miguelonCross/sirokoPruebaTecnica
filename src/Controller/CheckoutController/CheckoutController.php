@@ -26,8 +26,6 @@ class CheckoutController extends AbstractController
         try {
             $order = $this->checkoutProcess->execute(new CheckoutProcessRequest(new Uuid($request->order_uuid), $request->pan, $request->holder, $request->address))->order;
             if (!is_null($order)) {
-                var_dump($order);
-
                 return new JsonResponse((new OrderDTO($order))->toArray());
             }
 

@@ -24,7 +24,7 @@ class CheckoutProcess
     {
         $order = $this->getOrderByUUID->execute(new GetOrderByUUIDRequest($request->orderUUID))->order;
 
-        if (!is_null($order)) {
+        if (!is_null($order) && $order->status === 'CREATED') {
             /**
              * Aquí deberíamos tener una serie de llamdas a una pasarela de pagos.
              */

@@ -4,13 +4,11 @@ declare(strict_types=1);
 
 namespace App\utils;
 
-use App\dto\ShoppingCartDTO;
 use App\Entity\ShoppingCart;
 use App\Entity\ShoppingCartItem;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Uid\Uuid;
 use Symfony\Contracts\Cache\CacheInterface;
-use Symfony\Contracts\Cache\ItemInterface;
 
 class ShoppingCartUtils
 {
@@ -18,17 +16,21 @@ class ShoppingCartUtils
     ) {
     }
 
-    public static function addOrUpdateItem(Uuid $clientUUID, ShoppingCartItem $item, CacheItemPoolInterface $cacheItemPool): ShoppingCartDTO
+    public static function addOrUpdateItem(Uuid $clientUUID, ShoppingCartItem $item, CacheItemPoolInterface $cacheItemPool): ShoppingCart
     {
         $isProductInCartAlready = false;
 
         $cacheItem = $cacheItemPool->getItem($clientUUID->toRfc4122());
+
+        /**
+         * @var ShoppingCart $cart
+         */
         $cart = $cacheItem->isHit() ? $cacheItem->get() : ['uuid' => Uuid::v4()->toRfc4122(), 'items' => []];
 
         /**
          * @var ShoppingCartItem[] $productsInCart
          */
-        $productsInCart = $cart['items'];
+        $productsInCart = $cart->shoppingCartItems;
 
         for ($i = 0; $i < count($productsInCart); ++$i) {
             if ($productsInCart[$i]->product->uuid == $item->product->uuid->toRfc4122()) {
@@ -42,45 +44,20 @@ class ShoppingCartUtils
         }
 
         if (!$isProductInCartAlready && $item->quantity > 0) {
+            var_dump($item->quantity);
             $productsInCart[] = $item;
         }
-        $cart['items'] = $productsInCart;
+        $updatedCart = new ShoppingCart($cart->uuid, $productsInCart);
 
-        $cacheItem->set($cart);
+        $cacheItem->set($updatedCart);
         $cacheItemPool->save($cacheItem);
 
-        return new ShoppingCartDTO($cart['uuid'], $cart['items']);
+        return $updatedCart;
     }
 
     public static function deleteCart(Uuid $clientUUID, CacheInterface $cache): void
     {
         $cache->delete($clientUUID->toRfc4122());
-    }
-
-    /**
-     * @return array<mixed>
-     *
-     * @throws \Psr\Cache\InvalidArgumentException
-     */
-    public static function getCart(Uuid $clientUUID, CacheInterface $cache): array
-    {
-        /**
-         * @var ShoppingCart $cart
-         */
-        $cart = $cache->get($clientUUID->toRfc4122(), function (ItemInterface $item) {
-            /**
-             * @var ShoppingCartItem[] $shoppingCartItems
-             */
-            $shoppingCartItems = [];
-            $item->expiresAfter(3600);
-
-            return [
-                'uuid' => Uuid::v4()->toRfc4122(),
-                'items' => $shoppingCartItems,
-            ];
-        });
-
-        return $cart;
     }
 
     public static function deleteItem(Uuid $clientUUID, string $productUUID, CacheItemPoolInterface $cacheItemPool): ?bool
@@ -89,12 +66,15 @@ class ShoppingCartUtils
         $isDeletedItem = false;
 
         if ($cacheItem->isHit()) {
+            /**
+             * @var ShoppingCart $cart
+             */
             $cart = $cacheItem->get();
 
             /**
              * @var ShoppingCartItem[] $productsInCart
              */
-            $productsInCart = $cart['items'];
+            $productsInCart = $cart->shoppingCartItems;
 
             $remainingProducts = [];
             for ($i = 0; $i < count($productsInCart); ++$i) {
@@ -105,8 +85,8 @@ class ShoppingCartUtils
                 }
             }
 
-            $cart['items'] = $remainingProducts;
-            $cacheItem->set($cart);
+            $updatedCart = new ShoppingCart($cart->uuid, $remainingProducts);
+            $cacheItem->set($updatedCart);
             $cacheItemPool->save($cacheItem);
 
             return $isDeletedItem;

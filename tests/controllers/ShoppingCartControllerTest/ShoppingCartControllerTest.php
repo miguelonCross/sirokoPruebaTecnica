@@ -6,10 +6,12 @@ namespace App\Tests\controllers\ShoppingCartControllerTest;
 
 use App\dto\ShoppingCartDTO;
 use App\Entity\Product;
+use App\Entity\ShoppingCart;
 use App\Entity\ShoppingCartItem;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Uid\Uuid;
+use Symfony\Component\Uid\UuidV4;
 
 class ShoppingCartControllerTest extends WebTestCase
 {
@@ -34,7 +36,7 @@ class ShoppingCartControllerTest extends WebTestCase
 
         $shoppingCart = new ShoppingCartDTO('2a90c5d1-efee-449c-8134-2b3968bd0de8', [$shoppingCartItem]);
 
-        $item = $testCache->getItem($clientUUID)->set(['uuid' => '2a90c5d1-efee-449c-8134-2b3968bd0de8', 'products' => [$shoppingCartItem]]);
+        $item = $testCache->getItem($clientUUID)->set(new ShoppingCart(new UuidV4('2a90c5d1-efee-449c-8134-2b3968bd0de8'), [$shoppingCartItem]));
         $testCache->save($item);
         $container->set('cache.app', $testCache);
 
