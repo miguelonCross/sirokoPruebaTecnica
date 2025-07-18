@@ -15,6 +15,8 @@ Además tenemos un controlador que genera una orden indicándole un clientUUID b
 
 Por último otro endpoint procesa la orden (se falsea) mediante el order_uuid generado anteriormente (CheckOutProcess /checkout).
 
+
+Para persistir las ordenes he usado un fichero .json lamentablemente no he conseguido realizar estos test con éxito y debido a la falta de tiempo subo lo que tengo.
 ## Lanzar nuestro contenedor
     docker compose up --build -d && docker compose exec -it siroko-prueba-tecnica sh
 
