@@ -22,8 +22,12 @@ class DeleteShoppingCartController extends AbstractController
     #[Route('/shoppingCart', name: 'app_shopping_cart_delete', methods: ['DELETE'])]
     public function execute(#[MapRequestPayload] DeleteShoppingCartControllerRequest $request): JsonResponse
     {
-        ShoppingCartUtils::deleteCart(new Uuid($request->client_uuid), $this->cache);
+        try {
+            ShoppingCartUtils::deleteCart(new Uuid($request->client_uuid), $this->cache);
 
-        return new JsonResponse();
+            return new JsonResponse();
+        }catch (\Exception $exception){
+            return new JsonResponse(['error' => $exception->getMessage()], 400);
+        }
     }
 }

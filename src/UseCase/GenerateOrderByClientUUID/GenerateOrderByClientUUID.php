@@ -30,17 +30,12 @@ class GenerateOrderByClientUUID
             $ordersFile = file_get_contents(__DIR__.'/../../mocks/orders.json');
             $orders = json_decode((string) $ordersFile, true);
 
-            $orders[$order->uuid->toRfc4122()] = $order->toArray();
+            $orders[] = $order->toArray();
 
-            $isReaded = file_put_contents((string) $ordersFile, (string) json_encode($orders), LOCK_EX);
+            $isReaded = file_put_contents(__DIR__.'/../../mocks/orders.json', (string) json_encode($orders), LOCK_EX);
             if (false === $isReaded) {
                 throw new \Exception('Unable to write orders.json');
             }
-
-            var_dump('ORDERS');
-            var_dump($orders);
-            var_dump('ARCHIVO');
-            var_dump(file_get_contents(__DIR__.'/../../mocks/orders.json'));
         }
 
         return new GenerateOrderByClientUUIDResponse($order);
