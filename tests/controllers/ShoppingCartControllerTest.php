@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Tests\controllers;
 
 use App\dto\ShoppingCartDTO;
@@ -11,13 +13,14 @@ use Symfony\Component\Uid\Uuid;
 
 class ShoppingCartControllerTest extends WebTestCase
 {
-    public function test_givenEmptyFieldsShouldReturnBadRequest(): void
+    public function testGivenEmptyFieldsShouldReturnBadRequest(): void
     {
         $client = static::createClient();
         $client->request('POST', '/shoppingCart');
         $this->assertEquals(422, $client->getResponse()->getStatusCode());
     }
-    public function test_givenClientUUIDShouldReturnOK(): void
+
+    public function testGivenClientUUIDShouldReturnOK(): void
     {
         $client = static::createClient();
         $container = static::getContainer();
@@ -31,7 +34,7 @@ class ShoppingCartControllerTest extends WebTestCase
 
         $shoppingCart = new ShoppingCartDTO('2a90c5d1-efee-449c-8134-2b3968bd0de8', [$shoppingCartItem]);
 
-        $item = $testCache->getItem($clientUUID)->set(['uuid' => '2a90c5d1-efee-449c-8134-2b3968bd0de8', 'products' =>  [$shoppingCartItem]]);
+        $item = $testCache->getItem($clientUUID)->set(['uuid' => '2a90c5d1-efee-449c-8134-2b3968bd0de8', 'products' => [$shoppingCartItem]]);
         $testCache->save($item);
         $container->set('cache.app', $testCache);
 
@@ -41,10 +44,10 @@ class ShoppingCartControllerTest extends WebTestCase
             [],
             [],
             ['CONTENT_TYPE' => 'application/json'],
-            json_encode(['client_uuid'=> $clientUUID])
+            (string) json_encode(['client_uuid' => $clientUUID])
         );
 
-        $body = json_decode($client->getResponse()->getContent(), true);
+        $body = json_decode((string) $client->getResponse()->getContent(), true);
 
         $this->assertEquals($shoppingCart->toArray(), $body);
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
