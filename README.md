@@ -17,6 +17,9 @@
 
 
     Para persistir las ordenes he usado un fichero .json lamentablemente no he conseguido realizar estos test con éxito y debido a la falta de tiempo subo lo que tengo.
+    De este modo evito usar bases de datos, migraciones etc. Aunque con los problemas experimentados y por la falta de tiempo no he podido realizar exitosamente los test de los casos de uso que utilizan estos ficheros.
+    Posiblemente de haber generado las migraciones y entidades con las make:entity habría sido más fácil montando un docker con la base de datos.
+    
 ## Lanzar nuestro contenedor
     docker compose up --build -d && docker compose exec -it siroko-prueba-tecnica sh
 
